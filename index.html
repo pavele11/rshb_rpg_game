@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клубничный Король</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; color: #333; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        #resources { background: #333; color: white; padding: 10px; text-align: center; font-size: 18px; position: relative; z-index: 10; }
+        #step { text-align: center; font-size: 20px; margin: 10px; position: relative; z-index: 10; }
+        #header { text-align: center; font-size: 24px; font-weight: bold; margin: 10px; position: relative; z-index: 10; }
+        #text { padding: 20px; font-size: 18px; flex-grow: 1; position: relative; z-index: 10; }
+        #image { width: 100%; max-height: 200px; object-fit: cover; position: relative; z-index: 10; }
+        #options { display: flex; flex-direction: column; padding: 20px; gap: 15px; position: relative; z-index: 10; }
+        .option-btn { background: #007bff; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; text-align: left; position: relative; z-index: 10; }
+        .option-header { font-weight: bold; font-size: 20px; }
+        .option-text { font-size: 16px; }
+        #timer { text-align: center; font-size: 30px; font-weight: bold; color: red; margin: 10px; position: relative; z-index: 10; }
+
+        /* Стартовый экран */
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+        }
+        #start-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        #start-description {
+            font-size: 22px;
+            max-width: 80%;
+            margin-bottom: 60px;
+            line-height: 1.5;
+        }
+        #start-btn {
+            background: #fff;
+            color: #ff6b6b;
+            border: none;
+            padding: 20px 50px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        #start-btn:hover {
+            transform: scale(1.05);
+            transition: 0.2s;
+        }
+
+        #result-screen, #game-over-screen, #finish-screen { 
+            display: none; flex-direction: column; justify-content: center; align-items: center; 
+            height: 100vh; text-align: center; padding: 20px; position: relative; z-index: 20; 
+        }
+        #result-changes { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #007bff; }
+        #result-text { font-size: 22px; margin-bottom: 40px; max-width: 90%; }
+        #ok-btn, #restart-btn { background: #28a745; color: white; border: none; padding: 20px 40px; font-size: 24px; border-radius: 10px; z-index: 30; }
+    </style>
+</head>
+<body>
+
+    <!-- Стартовый экран -->
+    <div id="start-screen">
+        <h1 id="start-title">Клубничный Король</h1>
+        <p id="start-description">
+            Ты решил запустить бизнес по продаже клубники в шоколаде.<br>
+            Жена против, время поджимает, энергия на исходе.<br><br>
+            Сможешь ли ты выстроить дело, не выгорев и не потеряв семью?
+        </p>
+        <button id="start-btn">Начать игру</button>
+    </div>
+
+    <!-- Ресурсы (появятся после старта) -->
+    <div id="resources" style="display: none;">
+        Деньги: <span id="money">50</span> | Энергия: <span id="energy">50</span> | Репутация: <span id="reputation">0</span>
+    </div>
+
+    <div id="game-screen" style="display: none;">
+        <div id="timer"></div>
+        <div id="step"></div>
+        <div id="header"></div>
+        <img id="image" src="" alt="Иллюстрация">
+        <div id="text"></div>
+        <div id="options">
+            <button id="optionA" class="option-btn">
+                <div class="option-header" id="headerA"></div>
+                <div class="option-text" id="textA"></div>
+            </button>
+            <button id="optionB" class="option-btn">
+                <div class="option-header" id="headerB"></div>
+                <div class="option-text" id="textB"></div>
+            </button>
+            <button id="optionC" class="option-btn">
+                <div class="option-header" id="headerC"></div>
+                <div class="option-text" id="textC"></div>
+            </button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <div id="result-changes"></div>
+        <div id="result-text"></div>
+        <button id="ok-btn">Ок</button>
+    </div>
+
+    <div id="game-over-screen">
+        <h1>Игра окончена</h1>
+        <p>Энергия закончилась. Ты выгорел.</p>
+        <button id="restart-btn">Начать заново</button>
+    </div>
+
+    <div id="finish-screen">
+        <h1>Поздравляем!</h1>
+        <p>Ты прошёл все шаги и стал Клубничным Королём!</p>
+        <button id="restart-btn-finish">Начать заново</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        let steps = [];
+        let currentStep = 0;
+        let money = 50;
+        let energy = 50;
+        let reputation = 0;
+        let timerInterval;
+        let timeLeft;
+        let lastChanges = { m: 0, e: 0, r: 0 };
+
+        const moneyEl = document.getElementById('money');
+        const energyEl = document.getElementById('energy');
+        const reputationEl = document.getElementById('reputation');
+        const timerEl = document.getElementById('timer');
+        const resultChangesEl = document.getElementById('result-changes');
+
+        const startScreen = document.getElementById('start-screen');
+        const resourcesBar = document.getElementById('resources');
+        const gameScreen = document.getElementById('game-screen');
+
+        function updateResources() {
+            moneyEl.textContent = money;
+            energyEl.textContent = energy;
+            reputationEl.textContent = reputation;
+        }
+
+        function getTimerTime() {
+            if (energy > 75) return 12;
+            if (energy >= 25) return 9;
+            return 6;
+        }
+
+        function startTimer() {
+            timeLeft = getTimerTime();
+            timerEl.textContent = `Осталось: ${timeLeft} сек`;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = `Осталось: ${timeLeft} сек`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    autoChoose();
+                }
+            }, 1000);
+        }
+
+        function autoChoose() {
+            const choices = ['A', 'B', 'C'];
+            const random = choices[Math.floor(Math.random() * choices.length)];
+            applyChoice(random);
+        }
+
+        function formatChange(value) {
+            if (value > 0) return `+${value}`;
+            if (value < 0) return `${value}`;
+            return `+0`;
+        }
+
+        function loadStep() {
+            if (energy <= 0) {
+                gameOver();
+                return;
+            }
+
+            const stepData = steps[currentStep];
+            document.getElementById('step').textContent = `Шаг ${stepData.step}`;
+            document.getElementById('header').textContent = stepData.header;
+            document.getElementById('text').innerHTML = stepData.text.replace(/\n/g, '<br>');
+            document.getElementById('image').src = stepData.image_url;
+
+            document.getElementById('headerA').textContent = stepData.vA_header;
+            document.getElementById('textA').textContent = stepData.vA_text;
+            document.getElementById('headerB').textContent = stepData.vB_header;
+            document.getElementById('textB').textContent = stepData.vB_text;
+            document.getElementById('headerC').textContent = stepData.vC_header;
+            document.getElementById('textC').textContent = stepData.vC_text;
+
+            document.getElementById('optionA').onclick = () => applyChoice('A');
+            document.getElementById('optionB').onclick = () => applyChoice('B');
+            document.getElementById('optionC').onclick = () => applyChoice('C');
+
+            startTimer();
+        }
+
+        function applyChoice(choice) {
+            clearInterval(timerInterval);
+            const stepData = steps[currentStep];
+            const prefix = 'v' + choice + '_';
+
+            const dm = parseInt(stepData[prefix + 'm']) || 0;
+            const de = parseInt(stepData[prefix + 'e']) || 0;
+            const dr = parseInt(stepData[prefix + 'r']) || 0;
+
+            money += dm;
+            energy += de;
+            reputation += dr;
+
+            if (energy < 0) energy = 0;
+
+            lastChanges = { m: dm, e: de, r: dr };
+
+            updateResources();
+
+            gameScreen.style.display = 'none';
+            document.getElementById('result-screen').style.display = 'flex';
+
+            resultChangesEl.textContent = 
+                `${formatChange(dm)} Деньги | ${formatChange(de)} Энергия | ${formatChange(dr)} Репутация`;
+
+            document.getElementById('result-text').innerHTML = 
+                stepData[prefix + 'result'].replace(/\n/g, '<br>');
+        }
+
+        function nextStep() {
+            currentStep++;
+            if (currentStep >= steps.length) {
+                finishGame();
+                return;
+            }
+            document.getElementById('result-screen').style.display = 'none';
+            gameScreen.style.display = 'block';
+            loadStep();
+        }
+
+        function gameOver() {
+            clearInterval(timerInterval);
+            gameScreen.style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('game-over-screen').style.display = 'flex';
+        }
+
+        function finishGame() {
+            clearInterval(timerInterval);
+            gameScreen.style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('finish-screen').style.display = 'flex';
+        }
+
+        function restart() {
+            currentStep = 0;
+            money = 50;
+            energy = 50;
+            reputation = 0;
+            updateResources();
+            document.getElementById('game-over-screen').style.display = 'none';
+            document.getElementById('finish-screen').style.display = 'none';
+            startScreen.style.display = 'flex';
+            resourcesBar.style.display = 'none';
+            gameScreen.style.display = 'none';
+        }
+
+        // Кнопка старта
+        document.getElementById('start-btn').onclick = function() {
+            startScreen.style.display = 'none';
+            resourcesBar.style.display = 'block';
+            gameScreen.style.display = 'block';
+
+            // Загрузка CSV только после нажатия "Начать"
+            Papa.parse('GameParsing.csv', {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    steps = results.data.filter(row => row.step);
+                    steps.sort((a,b) => parseInt(a.step) - parseInt(b.step));
+                    loadStep();
+                }
+            });
+        };
+
+        document.getElementById('ok-btn').onclick = nextStep;
+        document.getElementById('restart-btn').onclick = restart;
+        document.getElementById('restart-btn-finish').onclick = restart;
+    </script>
+</body>
+</html>
