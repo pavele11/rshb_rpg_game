@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клубничный Король - Обучение</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .top-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+        }
+        .instruction-01 {
+            width: 100%;
+            max-width: 193px;
+            height: auto;
+            margin-left: 10%;
+            margin-right: 8px;
+        }
+        .instruction-02 {
+            width: 100%;
+            max-width: 228px;
+            height: auto;
+            margin-right: 56px;
+            margin-top: 19px;
+        }
+        .instruction-03 {
+            width: 100%;
+            max-width: 188px;
+            height: auto;
+            margin-left: 117px;
+        }
+        .player-bar {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+        }
+        .start-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .start-button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+            transition: 0.2s;
+        }
+        img {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <img src="asset/images/onboarding_top.png" alt="Верх" class="top-image">
+    <img src="asset/images/onboarding_instruction_01.png" alt="Инструкция 1" class="instruction-01">
+    <img src="asset/images/onboarding_instruction_02.png" alt="Инструкция 2" class="instruction-02">
+    <img src="asset/images/onboarding_player_bar.png" alt="Панель игрока" class="player-bar">
+    <img src="asset/images/onboarding_instruction_03.png" alt="Инструкция 3" class="instruction-03">
+    <button class="start-button" onclick="window.location.href='game.html'">Ю-ХУ-ХУ!</button>
+</body>
+</html>
+
