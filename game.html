@@ -283,6 +283,32 @@
             transform: scale(1.05);
             transition: 0.2s;
         }
+        #game-over-avatar {
+            transform: scale(1.0);
+            margin-bottom: 20px;
+            margin-top: 100px;
+        }
+        #game-over-text {
+            font-size: 16px;
+            margin-bottom: 30px;
+            max-width: 90%;
+        }
+        #restart-btn-gameover {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 30;
+        }
+        #restart-btn-gameover:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+            transition: 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -365,9 +391,9 @@
     </div>
 
     <div id="game-over-screen">
-        <h1>Игра окончена</h1>
-        <p>Энергия закончилась. Ты выгорел.</p>
-        <button id="restart-btn">Начать заново</button>
+        <img id="game-over-avatar" src="asset/images/player_ava.png" alt="Аватар игрока">
+        <div id="game-over-text">Вы выгорели, но всегда есть еще шанс, попробуйте еще.</div>
+        <button id="restart-btn-gameover">Восстать и сражаться!</button>
     </div>
 
     <div id="finish-screen">
@@ -586,6 +612,9 @@
 
         document.getElementById('ok-btn').onclick = nextStep;
         document.getElementById('restart-btn').onclick = restart;
+        document.getElementById('restart-btn-gameover').onclick = function() {
+            window.location.href = 'index.html';
+        };
         document.getElementById('restart-btn-finish').onclick = function() {
             window.location.href = 'index.html';
         };
