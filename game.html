@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Клубничный Король</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; color: #333; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        #resources { background: #333; color: white; padding: 10px; text-align: center; font-size: 18px; position: relative; z-index: 10; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; color: #333; display: flex; flex-direction: column; min-height: 100vh; overflow: auto; }
         #step-counter {
-            position: relative;
-            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 10px;
-            z-index: 10;
+            z-index: 15;
         }
         #step-counter-bg {
             position: relative;
@@ -52,15 +53,125 @@
             transition: width 0.3s ease;
             z-index: 1;
         }
+        #content-container {
+            width: 100%;
+            height: 390px;
+            background: #ccc;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 10px 10px 10px;
+            gap: 0;
+        }
+        #player-container {
+            width: 100%;
+            background: #555;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 10px 0;
+            position: relative;
+            min-height: 70px;
+        }
+        #player-inner {
+            width: 360px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        #player-ava {
+            transform: scale(0.5);
+            position: absolute;
+            bottom: -50px;
+            z-index: 10;
+            margin: -50px;
+        }
+        #energy-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            z-index: 20;
+        }
+        #money-counter {
+            position: absolute;
+            left: 0;
+            top: -45px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        #reputation-counter {
+            position: absolute;
+            right: 0;
+            top: -45px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .counter-icon {
+            width: 16px;
+            height: 16px;
+        }
+        #energy-icon {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.5);
+            z-index: 15;
+        }
         #step { display: none; }
-        #header { text-align: center; font-size: 24px; font-weight: bold; margin: 10px; position: relative; z-index: 10; }
-        #text { padding: 20px; font-size: 18px; flex-grow: 1; position: relative; z-index: 10; }
-        #image { width: 100%; max-height: 200px; object-fit: cover; position: relative; z-index: 10; }
-        #options { display: flex; flex-direction: column; padding: 20px; gap: 15px; position: relative; z-index: 10; }
+        #header { 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+            text-align: center;
+        }
+        #text { 
+            font-size: 12px; 
+            padding: 10px;
+            text-align: center;
+        }
+        #text-overlay {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 340px;
+            background: #aaa;
+            padding: 15px;
+            z-index: 20;
+            box-sizing: border-box;
+        }
+        #image-container {
+            margin-top: 0;
+            margin-left: -20px;
+        }
+        #image { 
+            width: 360px; 
+            height: 340px; 
+            object-fit: cover; 
+            position: relative;
+            margin-top: 30px;
+        }
+        #options { display: flex; flex-direction: column; padding: 20px; gap: 5px; margin-top: 8px; position: relative; z-index: 10; }
         .option-btn { background: #007bff; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; text-align: left; position: relative; z-index: 10; }
-        .option-header { font-weight: bold; font-size: 20px; }
-        .option-text { font-size: 16px; }
-        #timer { text-align: center; font-size: 30px; font-weight: bold; color: red; margin: 10px; position: relative; z-index: 10; }
+        .option-header { font-weight: bold; font-size: 12px; }
+        .option-text { font-size: 12px; }
+        #timer { display: none; }
 
         #result-screen, #game-over-screen, #finish-screen { 
             display: none; flex-direction: column; justify-content: center; align-items: center; 
@@ -73,26 +184,46 @@
 </head>
 <body>
 
-    <!-- Ресурсы -->
-    <div id="resources">
-        Деньги: <span id="money">50</span> | Энергия: <span id="energy">50</span> | Репутация: <span id="reputation">0</span>
+    <!-- Контейнер контента -->
+    <div id="content-container">
+        <!-- Картинка с текстом и счетчиком поверх -->
+        <div id="image-container" style="position: relative; display: inline-block;">
+            <img id="image" src="" alt="Иллюстрация">
+            <!-- Счетчик шагов -->
+            <div id="step-counter">
+                <div id="timer-bar"></div>
+                <div id="step-counter-bg">
+                    <img src="asset/images/steps_count_back.png" alt="Счетчик шагов">
+                    <div id="step-number">1</div>
+                </div>
+            </div>
+            <div id="text-overlay">
+                <div id="header"></div>
+                <div id="text"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Счетчик шагов -->
-    <div id="step-counter">
-        <div id="timer-bar"></div>
-        <div id="step-counter-bg">
-            <img src="asset/images/steps_count_back.png" alt="Счетчик шагов">
-            <div id="step-number">1</div>
+    <!-- Блок с аватаром игрока -->
+    <div id="player-container">
+        <div id="player-inner">
+            <div id="money-counter">
+                <img src="asset/images/money_icon.png" alt="Деньги" class="counter-icon">
+                <span>50</span>
+            </div>
+            <img id="player-ava" src="asset/images/player_ava.png" alt="Аватар игрока">
+            <div id="energy-value">50</div>
+            <div id="reputation-counter">
+                <img src="asset/images/reputation_icon.png" alt="Репутация" class="counter-icon">
+                <span>0</span>
+            </div>
+            <img id="energy-icon" src="asset/images/energy_icon.png" alt="Энергия">
         </div>
     </div>
 
     <div id="game-screen">
         <div id="timer"></div>
         <div id="step"></div>
-        <div id="header"></div>
-        <img id="image" src="" alt="Иллюстрация">
-        <div id="text"></div>
         <div id="options">
             <button id="optionA" class="option-btn">
                 <div class="option-header" id="headerA"></div>
@@ -138,21 +269,22 @@
         let timeLeft;
         let lastChanges = { m: 0, e: 0, r: 0 };
 
-        const moneyEl = document.getElementById('money');
-        const energyEl = document.getElementById('energy');
-        const reputationEl = document.getElementById('reputation');
+        const moneyEl = document.getElementById('money-counter');
+        const energyEl = document.getElementById('energy-value');
+        const reputationEl = document.getElementById('reputation-counter');
         const timerEl = document.getElementById('timer');
         const resultChangesEl = document.getElementById('result-changes');
         const stepNumberEl = document.getElementById('step-number');
         const timerBarEl = document.getElementById('timer-bar');
 
-        const resourcesBar = document.getElementById('resources');
         const gameScreen = document.getElementById('game-screen');
+        const contentContainer = document.getElementById('content-container');
+        const playerContainer = document.getElementById('player-container');
 
         function updateResources() {
-            moneyEl.textContent = money;
+            moneyEl.querySelector('span').textContent = money;
             energyEl.textContent = energy;
-            reputationEl.textContent = reputation;
+            reputationEl.querySelector('span').textContent = reputation;
         }
 
         function getTimerTime() {
@@ -203,6 +335,11 @@
                 return;
             }
 
+            // Убеждаемся, что элементы видны
+            contentContainer.style.display = 'flex';
+            playerContainer.style.display = 'flex';
+            gameScreen.style.display = 'block';
+
             const stepData = steps[currentStep];
             document.getElementById('step').textContent = `Шаг ${stepData.step}`;
             stepNumberEl.textContent = stepData.step;
@@ -244,6 +381,8 @@
             updateResources();
 
             gameScreen.style.display = 'none';
+            contentContainer.style.display = 'none';
+            playerContainer.style.display = 'none';
             document.getElementById('result-screen').style.display = 'flex';
 
             resultChangesEl.textContent = 
@@ -260,6 +399,8 @@
                 return;
             }
             document.getElementById('result-screen').style.display = 'none';
+            contentContainer.style.display = 'flex';
+            playerContainer.style.display = 'flex';
             gameScreen.style.display = 'block';
             loadStep();
         }
@@ -267,6 +408,8 @@
         function gameOver() {
             clearInterval(timerInterval);
             gameScreen.style.display = 'none';
+            contentContainer.style.display = 'none';
+            playerContainer.style.display = 'none';
             document.getElementById('result-screen').style.display = 'none';
             document.getElementById('game-over-screen').style.display = 'flex';
         }
@@ -274,6 +417,8 @@
         function finishGame() {
             clearInterval(timerInterval);
             gameScreen.style.display = 'none';
+            contentContainer.style.display = 'none';
+            playerContainer.style.display = 'none';
             document.getElementById('result-screen').style.display = 'none';
             document.getElementById('finish-screen').style.display = 'flex';
         }
@@ -286,7 +431,8 @@
             updateResources();
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('finish-screen').style.display = 'none';
-            resourcesBar.style.display = 'block';
+            contentContainer.style.display = 'flex';
+            playerContainer.style.display = 'flex';
             gameScreen.style.display = 'block';
             
             // Перезагрузка игры
