@@ -108,10 +108,10 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
+            transform: translate(-50%, calc(-50% + 25px));
+            font-size: 16px;
             font-weight: bold;
-            color: white;
+            color: black;
             z-index: 20;
         }
         #money-counter {
@@ -154,7 +154,7 @@
         }
         #energy-icon {
             position: absolute;
-            bottom: -40px;
+            bottom: -80px;
             left: 50%;
             transform: translateX(-50%) scale(0.5);
             z-index: 15;
