@@ -5,10 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Клубничный Король - Комикс</title>
     <style>
+        @keyframes backgroundMove {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 200px 200px;
+            }
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        html {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4 url('asset/images/strawberry_pattern.png') repeat;
+            background-position: 0 0;
+            background-size: auto;
+            animation: backgroundMove 30s linear infinite;
         }
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +36,6 @@
             align-items: center;
             justify-content: flex-start;
             padding-top: 20px;
-            background: #f4f4f4 url('asset/images/strawberry_pattern.png') repeat;
         }
         .comic-container {
             position: relative;
