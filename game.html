@@ -505,6 +505,31 @@
         const contentContainer = document.getElementById('content-container');
         const playerContainer = document.getElementById('player-container');
 
+        // Предзагрузка всех изображений в память
+        function preloadImages() {
+            const imagesToPreload = [];
+            
+            // Предзагрузка изображений story (1step.png до 10step.png)
+            for (let i = 1; i <= 10; i++) {
+                imagesToPreload.push(`asset/scenes/${i}step.png`);
+            }
+            
+            // Предзагрузка всех вариантов player_ava
+            const avaVariants = ['-4', '-3', '-2', '-1', '0', '+1', '+2', '+3', '+4'];
+            avaVariants.forEach(variant => {
+                imagesToPreload.push(`asset/images/player_ava_${variant}.png`);
+            });
+            
+            // Создаем объекты Image для предзагрузки
+            imagesToPreload.forEach(imageSrc => {
+                const img = new Image();
+                img.src = imageSrc;
+            });
+        }
+
+        // Запускаем предзагрузку сразу при загрузке скрипта
+        preloadImages();
+
         function getPlayerAvaImage() {
             if (energy < 5) return 'asset/images/player_ava_-4.png';
             if (energy >= 6 && energy <= 10) return 'asset/images/player_ava_-3.png';
